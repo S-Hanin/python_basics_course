@@ -1,5 +1,4 @@
 # -*-coding: utf8-*-
-import copy
 from collections import Counter
 
 
@@ -38,7 +37,8 @@ def generate_squares(size: int) -> dict:
 
 # task7
 def merge_dicts(first: dict, second: dict) -> dict:
-    result = copy.deepcopy(first)
+    result = {}
+    result.update(first)
     result.update(second)
     return result
 
