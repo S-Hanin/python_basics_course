@@ -9,11 +9,12 @@ def capitalize(text: str) -> str:
 
 # task2
 def count_frequency(text: str) -> dict:
-    return Counter(text)
+    return dict(Counter(text))
 
 
 # task3
 def cut_middle_chars(text: str) -> str:
+    text = text.strip()
     if len(text) < 2:
         return ""
     return f"{text[:2]}{text[-2:]}"
