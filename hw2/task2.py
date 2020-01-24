@@ -16,7 +16,7 @@ def print_squares_collection(upper_bound: int):
     print(collection)
 
 
-def count_numbers_devisible_by(lower_bound:int, upper_bound: int, divider: int):
+def count_numbers_divisible_by(lower_bound:int, upper_bound: int, divider: int):
     return len([number for number in range(lower_bound, upper_bound + 1)
                 if number % divider == 0])
 
