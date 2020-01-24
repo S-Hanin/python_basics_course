@@ -16,7 +16,7 @@ def print_squares_collection(upper_bound: int):
     print(collection)
 
 
-def count_numbers_divisible_by(lower_bound:int, upper_bound: int, divider: int):
+def count_numbers_divisible_by(lower_bound: int, upper_bound: int, divider: int):
     return len([number for number in range(lower_bound, upper_bound + 1)
                 if number % divider == 0])
 
@@ -25,21 +25,21 @@ def factorial(n: int):
     if n < 0 or not isinstance(n, int):
         raise ValueError(f"Invalid input value. 'n' should be integer > 0")
     result = 1
-    for number in range(1, n+1):
+    for number in range(1, n + 1):
         result = result * number
     return result
 
 
-def get_range(_from: int, _to: int, step: int = 1):
+def get_range(_from: int, _to: int, _step: int = 1):
     def _range(_from, _to, _step):
         # условие на случай отрицательного или положительного шага
-        condition = (lambda x, y: x < y) if step > 0 else (lambda x, y: x > y)
+        condition = (lambda x, y: x < y) if _step > 0 else (lambda x, y: x > y)
         i = _from
         while condition(i, _to):
             yield i
             i += _step
 
-    return list(_range(_from, _to, step))
+    return list(_range(_from, _to, _step))
 
 
 def prompt_login_password():
@@ -55,4 +55,3 @@ def prompt_login_password():
 
 if __name__ == '__main__':
     print_squares_collection(5)
-

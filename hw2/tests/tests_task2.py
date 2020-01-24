@@ -8,7 +8,7 @@ class Task2Test(unittest.TestCase):
         self.assertEqual([25, 9, 1, 1, 9, 25], task2.get_odd_number_squares(-5, 5))
 
     def test_numbers_in_range_divisible_by(self):
-        self.assertEqual(3, task2.count_numbers_devisible_by(3, 9, 3))
+        self.assertEqual(3, task2.count_numbers_divisible_by(3, 9, 3))
 
     def test_factorial_valid_argument(self):
         self.assertEqual(1, task2.factorial(0))
@@ -19,10 +19,12 @@ class Task2Test(unittest.TestCase):
         self.assertRaises(ValueError, task2.factorial, 3.14)
 
     def test_range_with_positive_step(self):
+        self.assertEqual(list(range(3)), task2.get_range(3))
         self.assertEqual(list(range(3)), task2.get_range(0, 3))
         self.assertEqual(list(range(0, 5, 2)), task2.get_range(0, 5, 2))
 
     def test_range_with_negative_step(self):
+        self.assertEqual(list(range(-3)), task2.get_range(-3))
         self.assertEqual(list(range(5, 0, -2)), task2.get_range(5, 0, -2))
         self.assertEqual(list(range(0, 5, -2)), task2.get_range(0, 5, -2))
 
