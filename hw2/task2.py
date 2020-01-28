@@ -45,12 +45,15 @@ def get_range(_from: int, _to: int, _step: int = 1):
 def prompt_login_password():
     secret_password = "asdf"
     while True:
-        login, password = input("Введите логин и пароль: ").split()
-        if password == secret_password:
-            print(f"Password for user: {login} is correct")
-            break
-        else:
-            print(f"Password for user: {login} is incorrect. Please try again")
+        try:
+            login, password = input("Введите логин и пароль: ").split()
+            if password == secret_password:
+                print(f"Password for user: {login} is correct")
+                break
+            else:
+                print(f"Password for user: {login} is incorrect. Please try again")
+        except ValueError as err:
+            print("Введите логин и пароль, разделенные пробелом")
 
 
 if __name__ == '__main__':
