@@ -1,5 +1,8 @@
 # -*- coding: utf8 -*-
 
+import functools
+import operator
+
 
 def get_odd_number_squares(lower_bound: int, upper_bound: int):
     odd_number_squares = []
@@ -24,10 +27,7 @@ def count_numbers_divisible_by(lower_bound: int, upper_bound: int, divider: int)
 def factorial(n: int):
     if n < 0 or not isinstance(n, int):
         raise ValueError(f"Invalid input value. 'n' should be integer > 0")
-    result = 1
-    for number in range(1, n + 1):
-        result = result * number
-    return result
+    return functools.reduce(operator.mul, range(1, n+1), 1)
 
 
 def get_range(_from: int, _to: int, _step: int = 1):
