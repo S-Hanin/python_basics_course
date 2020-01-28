@@ -34,10 +34,9 @@ def get_range(_from: int, _to: int, _step: int = 1):
     def _range(_from, _to, _step):
         # условие на случай отрицательного или положительного шага
         condition = (lambda x, y: x < y) if _step > 0 else (lambda x, y: x > y)
-        i = _from
-        while condition(i, _to):
-            yield i
-            i += _step
+        while condition(_from, _to):
+            yield _from
+            _from += _step
 
     return list(_range(_from, _to, _step))
 
