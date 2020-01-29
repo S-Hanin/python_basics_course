@@ -2,7 +2,7 @@
 
 
 def closest_to_zero(X):
-    return min({abs(float(x)): x for x in X})
+    return sorted(map(float, X), key=abs)[0]
 
 
 def user_input():

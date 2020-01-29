@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 
-def average(a, b, c, d):
+def average(a, b, c, d) -> tuple:
     args = [a, b, c, d]
     max_element = max(args)
     if not hasattr(average, "max") or average.max < max_element:
