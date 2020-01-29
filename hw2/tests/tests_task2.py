@@ -18,13 +18,22 @@ class Task2Test(unittest.TestCase):
         self.assertRaises(ValueError, task2.factorial, -1)
         self.assertRaises(ValueError, task2.factorial, 3.14)
 
+    def test_range_with_one_parameter(self):
+        self.assertListEqual(list(range(3)), task2.get_range(3))
+
     def test_range_with_positive_step(self):
-        self.assertEqual(list(range(3)), task2.get_range(0, 3))
-        self.assertEqual(list(range(0, 5, 2)), task2.get_range(0, 5, 2))
+        self.assertListEqual(list(range(3)), task2.get_range(0, 3))
+        self.assertListEqual(list(range(0, 5, 2)), task2.get_range(0, 5, 2))
 
     def test_range_with_negative_step(self):
-        self.assertEqual(list(range(5, 0, -2)), task2.get_range(5, 0, -2))
-        self.assertEqual(list(range(0, 5, -2)), task2.get_range(0, 5, -2))
+        self.assertListEqual(list(range(5, 0, -2)), task2.get_range(5, 0, -2))
+        self.assertListEqual(list(range(0, 5, -2)), task2.get_range(0, 5, -2))
+
+    def test_range_with_zero_step(self):
+        self.assertRaises(ValueError, task2.get_range, *(5, 0, 0))
+
+    def test_range_with_incorrect_order(self):
+        self.assertListEqual(list(range(3, 0)), task2.get_range(3, 0))
 
 
 if __name__ == '__main__':

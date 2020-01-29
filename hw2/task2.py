@@ -30,7 +30,7 @@ def factorial(n: int):
     return functools.reduce(operator.mul, range(1, n+1), 1)
 
 
-def get_range(_from: int, _to: int, _step: int = 1):
+def get_range(_from: int, _to: int = None, _step: int = 1):
     def _range(_from, _to, _step):
         # условие на случай отрицательного или положительного шага
         condition = (lambda x, y: x < y) if _step > 0 else (lambda x, y: x > y)
@@ -38,6 +38,11 @@ def get_range(_from: int, _to: int, _step: int = 1):
             yield _from
             _from += _step
 
+    if _from and _to is None:
+        _to = _from
+        _from = 0
+    if _step == 0:
+        raise ValueError("range() arg 3 must not be zero")
     return list(_range(_from, _to, _step))
 
 
