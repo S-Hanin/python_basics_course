@@ -12,7 +12,7 @@ def get_squares(collection: list) -> list:
     :param collection
     :return:list
     """
-    return [item**2 for item in collection]
+    return [item ** 2 for item in collection]
 
 
 def get_even_positioned_elements(collection: list) -> list:
@@ -25,11 +25,11 @@ def get_even_positioned_elements(collection: list) -> list:
             if i % 2 == 0]
 
 
-def get_cubes_of_evens(collection: list) -> list:
+def get_cubes_of_evens_on_odd_places(collection: list) -> list:
     """
     Returns cubes of even elements from odd positions
     :param collection:
     :return: list
     """
-    return [item**3 for i, item in enumerate(collection)
+    return [item ** 3 for i, item in enumerate(collection)
             if i % 2 != 0 and item % 2 == 0]

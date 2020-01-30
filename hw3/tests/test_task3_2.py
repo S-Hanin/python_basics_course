@@ -26,7 +26,7 @@ class Task32Test(unittest.TestCase):
         self.assertEqual((8, 12), task3_2.add_up_and_multiply(a))
 
     def test_sum_keyword_arguments(self):
-        a = {k: v for k, v in zip("abcd", [1, 2, 3, 4])}
+        a = dict(zip("abcd", [1, 2, 3, 4]))
         self.assertEqual((10, 24), task3_2.add_up_and_multiply(**a))
 
     def test_zero_is_skipped(self):

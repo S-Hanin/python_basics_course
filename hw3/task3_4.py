@@ -32,7 +32,7 @@ def xm_to_dict(xml_string):
         for item in element:
             child = {'name': item.tag, 'children': []}
             children.append(child)
-            if len(list(item)):
+            if len(list(item)) > 0:
                 build(item, child['children'])
 
     doc = Et.fromstring(xml_string)
