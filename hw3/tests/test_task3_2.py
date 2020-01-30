@@ -1,6 +1,6 @@
 import unittest
 
-import task3_2
+from hw3 import task3_2
 
 
 class Task32Test(unittest.TestCase):

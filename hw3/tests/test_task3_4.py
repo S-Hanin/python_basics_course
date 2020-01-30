@@ -1,6 +1,6 @@
 import unittest
 
-import task3_4
+from hw3 import task3_4
 
 
 class Task34Test(unittest.TestCase):
@@ -10,7 +10,7 @@ class Task34Test(unittest.TestCase):
             '<root><element1 /><element2 /><element3><element4><element5 /> </element4></element3></root>'
         )
 
-    def test_xml_to_dict_returns_elements_dict(self):
+    def test_xml_to_dict_returns_elements_dict_and_depth(self):
         expected_tree = {
             'name': 'root',
             'children': [
