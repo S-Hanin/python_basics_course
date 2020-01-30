@@ -3,7 +3,7 @@ import unittest
 import task3_2
 
 
-class Task3_2_Test(unittest.TestCase):
+class Task32Test(unittest.TestCase):
     def test_should_flatten_iterable(self):
         self.assertListEqual([1, 2, 3], task3_2.flatten([1, [2, [3]]]))
 

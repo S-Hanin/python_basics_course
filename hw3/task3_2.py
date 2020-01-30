@@ -5,8 +5,8 @@ import operator
 
 
 def flatten(iterable):
-    def is_cycled_iterable(iterable) -> bool:
-        return iterable in iterable
+    def is_cycled_iterable(collection) -> bool:
+        return collection in collection
 
     result = []
     for item in iterable:

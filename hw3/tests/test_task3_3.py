@@ -3,7 +3,7 @@ import unittest
 from hw3 import task3_3
 
 
-class Task3_3_Test(unittest.TestCase):
+class Task33Test(unittest.TestCase):
     def test_average(self):
         self.assertEqual((1.0, 1), task3_3.average(1, 1, 1, 1))
 

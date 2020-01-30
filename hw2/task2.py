@@ -47,7 +47,7 @@ def get_range(_from: int, _to: int = None, _step: int = 1):
 
 
 def prompt_login_password():
-    secret_password = "asdf"
+    secret_password = "1234"
     while True:
         try:
             login, password = input("Введите логин и пароль: ").split()

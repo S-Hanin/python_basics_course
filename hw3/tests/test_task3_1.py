@@ -3,7 +3,7 @@ import unittest
 from hw3 import task3_1
 
 
-class Task3_1_Test(unittest.TestCase):
+class Task31Test(unittest.TestCase):
     def test_get_squares(self):
         self.assertListEqual([0, 1, 4, 9], task3_1.get_squares(list(range(4))))
 
