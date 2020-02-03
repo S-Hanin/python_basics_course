@@ -12,15 +12,23 @@ import functools
 import operator
 
 
-def flatten(iterable):
-    def is_cycled_iterable(collection) -> bool:
-        return collection in collection
+def is_cycled_iterable(collection) -> bool:
+    collections = [collection]
+    visited = []
+    while len(collections) > 0:
+        visited.append(collections.pop())
+        for item in visited[-1]:
+            if item in visited:
+                return True
+            if isinstance(item, (list, tuple)):
+                collections.append(item)
+    return False
 
+
+def flatten(iterable):
     result = []
     for item in iterable:
         if isinstance(item, (tuple, list)):
-            if is_cycled_iterable(item):
-                return None
             result.extend(flatten(item))
         else:
             result.append(item)
@@ -28,9 +36,11 @@ def flatten(iterable):
 
 
 def add_up_and_multiply(*args, **kwargs):
-    flat_list = flatten(list(args) + list(kwargs.values()))
-    if not flat_list:
+    arguments = list(args) + list(kwargs.values())
+    if is_cycled_iterable(arguments):
+        print("arguments has cycled links")
         return None
+    flat_list = flatten(arguments)
     _sum = sum(flat_list)
     _mul = functools.reduce(operator.mul, filter(None, flat_list))
     return _sum, _mul

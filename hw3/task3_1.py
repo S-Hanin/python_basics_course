@@ -21,8 +21,7 @@ def get_even_positioned_elements(collection: list) -> list:
     :param collection:
     :return:list
     """
-    return [item for i, item in enumerate(collection)
-            if i % 2 == 0]
+    return [item for item in collection[::2]]
 
 
 def get_cubes_of_evens_on_odd_places(collection: list) -> list:
@@ -31,5 +30,5 @@ def get_cubes_of_evens_on_odd_places(collection: list) -> list:
     :param collection:
     :return: list
     """
-    return [item ** 3 for i, item in enumerate(collection)
-            if i % 2 != 0 and item % 2 == 0]
+    return [item ** 3 for item in collection[1::2]
+            if item % 2 == 0]

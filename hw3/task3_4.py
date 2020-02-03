@@ -27,16 +27,14 @@ import xml.etree.ElementTree as Et
 
 
 def xm_to_dict(xml_string):
-    def build(element: Et.Element, children: list):
-        build.levels += 1
+    def build(element: Et.Element):
+        node = {'name': element.tag, 'children': []}
         for item in element:
-            child = {'name': item.tag, 'children': []}
-            children.append(child)
-            if len(list(item)) > 0:
-                build(item, child['children'])
+            node['children'].append(build(item))
+        if len(element) > 0:
+            build.levels += 1
+        return node
 
     doc = Et.fromstring(xml_string)
-    tree = {'name': doc.tag, 'children': []}
     build.levels = 0
-    build(doc, tree['children'])
-    return tree, build.levels
+    return build(doc), build.levels
