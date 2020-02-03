@@ -11,9 +11,8 @@
 # пример foo() -> пользователь ввел '1 2 -0.5 0.75 22' -> функция доджна вернуть -0.5
 
 
-def closest_to_zero(x):
-    return sorted(map(float, x), key=abs)[0]
+f=lambda x:sorted(map(float, x),key=abs)[0]
+u=lambda: f(input().split())
 
-
-def user_input():
-    return closest_to_zero(input().split())
+if __name__ == '__main__':
+    u()

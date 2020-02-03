@@ -10,6 +10,7 @@
 
 import functools
 import operator
+from collections.abc import Iterable
 
 
 def is_cycled_iterable(collection) -> bool:
@@ -20,22 +21,22 @@ def is_cycled_iterable(collection) -> bool:
         for item in visited[-1]:
             if item in visited:
                 return True
-            if isinstance(item, (list, tuple)):
+            if isinstance(item, Iterable):
                 collections.append(item)
     return False
 
 
-def flatten(iterable):
+def flatten(iterable) -> list:
     result = []
     for item in iterable:
-        if isinstance(item, (tuple, list)):
+        if isinstance(item, Iterable):
             result.extend(flatten(item))
         else:
             result.append(item)
     return result
 
 
-def add_up_and_multiply(*args, **kwargs):
+def add_up_and_multiply(*args, **kwargs) -> (int, int):
     arguments = list(args) + list(kwargs.values())
     if is_cycled_iterable(arguments):
         print("arguments has cycled links")
