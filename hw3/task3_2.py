@@ -21,11 +21,12 @@ def is_cycled_iterable(collection) -> bool:
     :return: bool
     """
     collections = [collection]
-    visited = []
+    visited = {}
     while len(collections) > 0:
-        visited.append(collections.pop())
-        for item in visited[-1]:
-            if item in visited:
+        current = collections.pop()
+        visited[id(current)] = True
+        for item in current:
+            if visited.get(id(item), False):
                 return True
             if isinstance(item, Iterable):
                 collections.append(item)
