@@ -27,6 +27,14 @@ import xml.etree.ElementTree as Et
 
 
 def xm_to_dict(xml_string):
+    """
+    Converts xml document string to tree with dictionary nodes.
+    Example: {'name': tag, 'children': []}
+
+    :param xml_string: xml document text
+    :return: dict
+    """
+
     def build(element: Et.Element):
         node = {'name': element.tag, 'children': []}
         for item in element:

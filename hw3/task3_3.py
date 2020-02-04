@@ -10,6 +10,16 @@
 
 
 def average(a, b, c, d) -> tuple:
+    """
+    Returns tuple of average between arguments and max argument
+    between calls
+
+    :param a: number
+    :param b: number
+    :param c: number
+    :param d: number
+    :return: tuple(number, number)
+    """
     args = [a, b, c, d]
     max_element = max(args)
     if not hasattr(average, "max") or average.max < max_element:

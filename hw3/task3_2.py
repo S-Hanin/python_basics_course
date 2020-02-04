@@ -14,6 +14,12 @@ from collections.abc import Iterable
 
 
 def is_cycled_iterable(collection) -> bool:
+    """
+    Checks that collection has cycled links at arbitrary level
+
+    :param collection:
+    :return: bool
+    """
     collections = [collection]
     visited = []
     while len(collections) > 0:
@@ -27,6 +33,12 @@ def is_cycled_iterable(collection) -> bool:
 
 
 def flatten(iterable) -> list:
+    """
+    Unwrap arbitrary nesting iterable
+
+    :param iterable: any iterable
+    :return: iterable
+    """
     result = []
     for item in iterable:
         if isinstance(item, Iterable):
@@ -37,6 +49,15 @@ def flatten(iterable) -> list:
 
 
 def add_up_and_multiply(*args, **kwargs) -> (int, int):
+    """
+    Accept any number of positional and keyword arguments
+    and return their sum and product.
+    Parameters can be any number or iterable of numbers
+
+    :param args: number or iterable of numbers
+    :param kwargs: number or iterable of numbers
+    :return: tuple(int, int)
+    """
     arguments = list(args) + list(kwargs.values())
     if is_cycled_iterable(arguments):
         print("arguments has cycled links")
