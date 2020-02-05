@@ -7,18 +7,6 @@ class Task32Test(unittest.TestCase):
     def test_should_flatten_iterable(self):
         self.assertListEqual([1, 2, 3], task3_2.flatten([1, [2, [3]]]))
 
-    def test_first_level_cycled_iterable(self):
-        a = [1, 2]
-        a.append(a)
-        self.assertTrue(task3_2.is_cycled_iterable(a))
-
-    def test_second_level_cycled_iterable(self):
-        a = [1, 2]
-        b = [3, 4]
-        a.append(b)
-        b.append(a)
-        self.assertTrue(task3_2.is_cycled_iterable(a))
-
     def test_returns_none_with_cycled_iterable(self):
         a = [1, 2]
         a.append(a)
