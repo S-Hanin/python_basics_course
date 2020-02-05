@@ -54,8 +54,7 @@ def prompt_login_password():
             if password == secret_password:
                 print(f"Password for user: {login} is correct")
                 break
-            else:
-                print(f"Password for user: {login} is incorrect. Please try again")
+            print(f"Password for user: {login} is incorrect. Please try again")
         except ValueError:
             print("Введите логин и пароль, разделенные пробелом")
 

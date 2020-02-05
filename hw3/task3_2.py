@@ -10,27 +10,8 @@
 
 import functools
 import operator
+import pprint
 from collections.abc import Iterable
-
-
-def is_cycled_iterable(collection) -> bool:
-    """
-    Checks that collection has cycled links at arbitrary level
-
-    :param collection:
-    :return: bool
-    """
-    collections = [collection]
-    visited = {}
-    while len(collections) > 0:
-        current = collections.pop()
-        visited[id(current)] = True
-        for item in current:
-            if visited.get(id(item), False):
-                return True
-            if isinstance(item, Iterable):
-                collections.append(item)
-    return False
 
 
 def flatten(iterable) -> list:
@@ -60,7 +41,7 @@ def add_up_and_multiply(*args, **kwargs) -> (int, int):
     :return: tuple(int, int)
     """
     arguments = list(args) + list(kwargs.values())
-    if is_cycled_iterable(arguments):
+    if pprint.isrecursive(arguments):
         print("arguments has cycled links")
         return None
     flat_list = flatten(arguments)
