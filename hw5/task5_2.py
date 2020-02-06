@@ -22,64 +22,84 @@ conf = {
 """
 
 import random
-from collections import namedtuple
+
+
+class Course:
+    def __init__(self, conf):
+        self.conf = conf
+        self.labs = {}
+        self.exam = []
+
+    def add_lab(self, mark, lab_id=None):
+        if lab_id is None:
+            lab_id = 0
+        tries = self.labs.setdefault(lab_id, [])
+        if len(tries) > 5:
+            raise Exception("Can't pass the task anymore, limit is reached")
+        tries.append(mark)
+
+    def add_exam(self, mark):
+        self.exam.append(mark)
+
+    def total_points(self):
+        points = sum(self._labs_points())
+        points += self._exam_points()
+        return points
+
+    def maximum_points(self):
+        return (self.conf['lab_max']
+                * self.conf['lab_num']
+                + self.conf['exam_max'])
+
+    def is_certified(self):
+        maximum_points = self.maximum_points()
+        total_points = self.total_points()
+        is_pass = (total_points / maximum_points) > self.conf.get('k')
+        return total_points, is_pass
+
+    def _labs_points(self):
+        for lab_id, marks in self.labs.items():
+            if 0 <= lab_id <= self.conf['lab_num']:
+                mark = marks[-1]
+                yield mark if self._is_valid_lab_mark(mark) else 0
+
+    def _is_valid_lab_mark(self, mark):
+        if mark is None:
+            return False
+        elif 0 > mark or mark > self.conf.get('lab_max'):
+            return False
+        else:
+            return True
+
+    def _exam_points(self):
+        if len(self.exam) == 0:
+            return 0
+        mark = self.exam[-1]
+        return mark if self._is_valid_exam_mark(mark) else 0
+
+    def _is_valid_exam_mark(self, mark):
+        if mark is None:
+            return False
+        if mark < 0 or mark > self.conf['exam_max']:
+            return False
+        return True
 
 
 class Student:
-    Lab = namedtuple("Lab", "id mark")
-
     def __init__(self, name, course_conf):
         self.name = name
-        self.course_progress = {}
-        self.course_conf = course_conf
+        self.course = Course(course_conf)
 
-    def make_lab(self, mark, lab_id):
-        self.course_progress.setdefault('labs', []).append(self.Lab(lab_id, mark))
+    def make_lab(self, mark, lab_id=None):
+        self.course.add_lab(mark, lab_id)
         return self
 
     def make_exam(self, mark):
-        if (mark is not None) and (0 < mark <= self.course_conf.get('exam_max')):
-            self.course_progress['exam'] = mark
+        self.course.add_exam(mark)
         return self
 
     def is_certified(self):
-        maximum_points = self._maximum_points()
-        total_points = self._total_points()
-        is_pass = (total_points / maximum_points) > self.course_conf.get('k')
-        return total_points, is_pass
-
-    def _total_points(self):
-        labs = self.course_progress.get('labs')
-        total_points = sum((lab.mark for lab in self._lab_filter(labs)))
-        total_points += self.course_progress.get('exam', 0)
-        return total_points
-
-    def _lab_filter(self, labs):
-        lab_ids = set()
-        latest = []
-        for lab in reversed(labs):
-            if not lab.id in lab_ids:
-                latest.append(lab)
-            lab_ids.add(lab.id)
-        for lab in latest:
-            if 0 > lab.id or lab.id > self.course_conf.get('lab_num'):
-                yield self.Lab(lab.id, 0)
-            elif lab.mark is None:
-                yield self.Lab(lab.id, 0)
-            elif 0 > lab.mark or lab.mark > self.course_conf.get('lab_max'):
-                yield self.Lab(lab.id, 0)
-            else:
-                yield lab
-
-    def _exam_filter(self, mark):
-        if 0 > mark > self.course_conf.get('exam_max'):
-            return 0
-        return mark
-
-    def _maximum_points(self):
-        return (self.course_conf['lab_max']
-                * self.course_conf['lab_num']
-                + self.course_conf['exam_max'])
+        return self.course.is_certified()
 
 
 course_conf = {
@@ -92,7 +112,7 @@ a = Student("Vasya", course_conf)
 for lab_id in range(0, 40):
     a.make_lab(random.randint(1, 7), random.randint(1, 20))
 else:
-    a.make_lab(None, 1)
+    a.make_lab(1)
     a.make_exam(30)
 
 print(a.is_certified())
