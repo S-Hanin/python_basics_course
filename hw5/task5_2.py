@@ -25,94 +25,191 @@ import random
 
 
 class Course:
+    """
+    Course representation
+    """
+    MAX_LAB_ATTEMPTS = 5
+
     def __init__(self, conf):
         self.conf = conf
         self.labs = {}
         self.exam = []
 
     def add_lab(self, mark, lab_id=None):
+        """
+        Добавляет оценку за лабораторную работу.
+        Если lab_id == None - ищется первое невыполненное
+        задание по возрастанию
+
+        :param mark: mark for lab
+        :param lab_id: lab work id
+        """
         if lab_id is None:
-            lab_id = 0
+            lab_id = self._get_unfulfilled_lab()
         tries = self.labs.setdefault(lab_id, [])
-        if len(tries) > 5:
+        # ограниченное число попыток сдачи
+        if len(tries) > self.MAX_LAB_ATTEMPTS:
             raise Exception("Can't pass the task anymore, limit is reached")
         tries.append(mark)
 
+    def _get_unfulfilled_lab(self):
+        """
+        Находит первую невыполненную задачу
+
+        :raises: LookupError
+        :return: lab id
+        """
+        for lab_id in range(self.conf["lab_num"]):
+            if lab_id not in self.labs:
+                return lab_id
+        raise LookupError("Can't find unfulfilled task. All tasks done")
+
     def add_exam(self, mark):
+        """
+        :param mark: mark for exam
+        """
         self.exam.append(mark)
 
+    @property
     def total_points(self):
+        """
+        Сумма набранных баллов\n
+        :return: int
+        """
         points = sum(self._labs_points())
         points += self._exam_points()
         return points
 
+    @property
     def maximum_points(self):
+        """
+        Максимальное кол-во баллов
+
+        :return: int
+        """
         return (self.conf['lab_max']
                 * self.conf['lab_num']
                 + self.conf['exam_max'])
 
     def is_certified(self):
-        maximum_points = self.maximum_points()
-        total_points = self.total_points()
-        is_pass = (total_points / maximum_points) > self.conf.get('k')
-        return total_points, is_pass
+        """
+        Подсчитывает кол-во набранных баллов и
+        определяет пройден ли курс
+
+        :return: int, bool
+        """
+        is_pass = (self.total_points / self.maximum_points) > self.conf.get('k')
+        return self.total_points, is_pass
 
     def _labs_points(self):
+        """
+        Выбирает оценки по основным лабораторным работам
+
+        :return: int
+        """
         for lab_id, marks in self.labs.items():
             if 0 <= lab_id <= self.conf['lab_num']:
                 mark = marks[-1]
                 yield mark if self._is_valid_lab_mark(mark) else 0
 
     def _is_valid_lab_mark(self, mark):
-        if mark is None:
+        """
+        Проверяет корректность оценки за лабораторную работу
+
+        :param mark:
+        :return: None
+        """
+        rules = [lambda x: x is None,
+                 lambda x: x < 0 or x > self.conf.get('lab_max')]
+        if any(check(mark) for check in rules):
             return False
-        elif 0 > mark or mark > self.conf.get('lab_max'):
-            return False
-        else:
-            return True
+        return True
 
     def _exam_points(self):
+        """
+        Выбирает последнюю оценку за экзамен из всех попыток
+
+        :return: int
+        """
         if len(self.exam) == 0:
             return 0
         mark = self.exam[-1]
         return mark if self._is_valid_exam_mark(mark) else 0
 
     def _is_valid_exam_mark(self, mark):
-        if mark is None:
-            return False
-        if mark < 0 or mark > self.conf['exam_max']:
+        """
+        Проверяет корректность оценки за экзамен
+
+        :param: mark
+        :return: bool
+        """
+        rules = [lambda x: x is None,
+                 lambda x: x < 0 or x > self.conf['exam_max']]
+        if any(check(mark) for check in rules):
             return False
         return True
 
 
 class Student:
+    """
+    Student representation
+    """
     def __init__(self, name, course_conf):
+        """
+        :param name: Имя студента
+        :param course_conf: Конфигурация курса
+        """
         self.name = name
         self.course = Course(course_conf)
 
     def make_lab(self, mark, lab_id=None):
+        """
+        Получить оценку за лабораторную работу\n
+        :param mark: Оценка
+        :param lab_id: Номер лабораторной работы
+        :return: self
+        """
         self.course.add_lab(mark, lab_id)
         return self
 
     def make_exam(self, mark):
+        """
+        Получить оценка за экзамен
+
+        :param mark: Оценка дза экзамен
+        :return: self
+        """
         self.course.add_exam(mark)
         return self
 
     def is_certified(self):
+        """
+        Проверяет пройден ли курс
+
+        :return: int, bool
+        """
         return self.course.is_certified()
 
 
-course_conf = {
-    "exam_max": 30,
-    "lab_max": 7,
-    "lab_num": 10,
-    "k": 0.61,
-}
-a = Student("Vasya", course_conf)
-for lab_id in range(0, 40):
-    a.make_lab(random.randint(1, 7), random.randint(1, 20))
-else:
-    a.make_lab(1)
-    a.make_exam(30)
+def main():
+    """
+    Class Student at work
+    """
+    course_conf = {
+        "exam_max": 30,
+        "lab_max": 7,
+        "lab_num": 10,
+        "k": 0.61,
+    }
 
-print(a.is_certified())
+    student = Student("Vasya", course_conf)
+    for _ in range(0, 8):
+        student.make_lab(random.randint(1, 7))
+    student.make_lab(1)
+    student.make_exam(30)
+
+    print(student.is_certified())
+
+
+if __name__ == '__main__':
+    main()

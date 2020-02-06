@@ -8,8 +8,15 @@
 
 
 class Observable:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+    """
+    Базовый класс, позволяет наследникам заносить все
+    переданные в конструктор именованные значения как
+    атрибуты без вызова super().__init__
+    """
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls)
+        obj.__dict__.update(kwargs)
+        return obj
 
     def __str__(self):
         args = ", ".join(
