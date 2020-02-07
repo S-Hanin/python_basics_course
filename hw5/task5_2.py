@@ -34,6 +34,10 @@ class Course:
         self.conf = conf
         self.labs = {}
         self.exam = []
+        self._lab_check_rules = [lambda x: x is None,
+                                 lambda x: x < 0 or x > self.conf['lab_max']]
+        self._exam_check_rules = [lambda x: x is None,
+                                  lambda x: x < 0 or x > self.conf['exam_max']]
 
     def add_lab(self, mark, lab_id=None):
         """
@@ -73,7 +77,8 @@ class Course:
     @property
     def total_points(self):
         """
-        Сумма набранных баллов\n
+        Сумма набранных баллов
+
         :return: int
         """
         points = sum(self._labs_points())
@@ -110,20 +115,7 @@ class Course:
         for lab_id, marks in self.labs.items():
             if 0 <= lab_id <= self.conf['lab_num']:
                 mark = marks[-1]
-                yield mark if self._is_valid_lab_mark(mark) else 0
-
-    def _is_valid_lab_mark(self, mark):
-        """
-        Проверяет корректность оценки за лабораторную работу
-
-        :param mark:
-        :return: None
-        """
-        rules = [lambda x: x is None,
-                 lambda x: x < 0 or x > self.conf.get('lab_max')]
-        if any(check(mark) for check in rules):
-            return False
-        return True
+                yield mark if self._is_valid_mark(mark, self._lab_check_rules) else 0
 
     def _exam_points(self):
         """
@@ -134,17 +126,16 @@ class Course:
         if len(self.exam) == 0:
             return 0
         mark = self.exam[-1]
-        return mark if self._is_valid_exam_mark(mark) else 0
+        return mark if self._is_valid_mark(mark, self._exam_check_rules) else 0
 
-    def _is_valid_exam_mark(self, mark):
+    def _is_valid_mark(self, mark, rules):
         """
-        Проверяет корректность оценки за экзамен
+        Проверяет корректность оценки за лабораторную работу
 
-        :param: mark
-        :return: bool
+        :param mark:
+        :param rules: list of predicates
+        :return: None
         """
-        rules = [lambda x: x is None,
-                 lambda x: x < 0 or x > self.conf['exam_max']]
         if any(check(mark) for check in rules):
             return False
         return True
@@ -154,6 +145,7 @@ class Student:
     """
     Student representation
     """
+
     def __init__(self, name, course_conf):
         """
         :param name: Имя студента
@@ -164,7 +156,8 @@ class Student:
 
     def make_lab(self, mark, lab_id=None):
         """
-        Получить оценку за лабораторную работу\n
+        Получить оценку за лабораторную работу
+
         :param mark: Оценка
         :param lab_id: Номер лабораторной работы
         :return: self
@@ -174,7 +167,7 @@ class Student:
 
     def make_exam(self, mark):
         """
-        Получить оценка за экзамен
+        Получить оценку за экзамен
 
         :param mark: Оценка дза экзамен
         :return: self
