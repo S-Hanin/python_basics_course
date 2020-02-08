@@ -17,18 +17,11 @@ def associate(keys, values):
     :return: dict
     """
     result = {}
-    key_it, val_it = iter(keys), iter(values)
+    val_it = iter(values)
 
-    while True:
+    for key in keys:
         try:
-            key = next(key_it)
+            result[key] = next(val_it)
         except StopIteration:
-            break
-
-        try:
-            val = next(val_it)
-        except StopIteration:
-            val = None
-        result[key] = val
-
+            result[key] = None
     return result
