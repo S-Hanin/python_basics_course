@@ -13,4 +13,4 @@ def get_public_attributes(obj):
     :param obj: Any object
     :return: list
     """
-    return [attr for attr in obj.__dict__ if not attr.startswith("_")]
+    return [attr for attr in dir(obj) if not attr.startswith("_")]
