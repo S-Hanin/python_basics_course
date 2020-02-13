@@ -14,8 +14,6 @@ def cycle(collection: Sequence):
     `repeat` times
 
     :param collection: sized iterable
-    :param repeat: repeat count
-    :return: LoopedIterator
     """
     while True:
         yield from (item for item in collection)
