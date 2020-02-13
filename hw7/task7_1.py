@@ -12,11 +12,11 @@ import time
 logging.basicConfig(level=logging.INFO)
 
 
-def average_time(n: int):
+def average_time(calls_count: int):
     """
     Decorator. Measures average call time for n last calls
     """
-    if n <= 0:
+    if calls_count <= 0:
         raise ValueError("Argument must be int > 0")
 
     def wrap(func):
@@ -28,8 +28,9 @@ def average_time(n: int):
             start = time.time()
             func_result = func(*args, **kwargs)
             counted.append(time.time() - start)
-            counted = counted[-n:]
+            counted = counted[-calls_count:]
             average = sum(counted) / len(counted) * 1000
+            # noinspection Pylint
             logging.info(f"Среднее время работы: {average:.0f} мс")
             return func_result
 
@@ -39,13 +40,16 @@ def average_time(n: int):
 
 
 @average_time(2)
-def foo(sleep_time):
+def foo_test(sleep_time):
+    """
+    Decorator work test
+    """
+
     time.sleep(sleep_time)
     return sleep_time
 
 
 if __name__ == '__main__':
-    foo(3)
-    foo(7)
-    foo(1)
-    print(foo.__name__)
+    foo_test(3)
+    foo_test(7)
+    foo_test(1)
