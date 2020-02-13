@@ -5,6 +5,7 @@
 позиционных аргументов f(a, b, c, d) в вызов
 вида f(a)(b)(c)(d), используя декоратор.
 """
+import functools
 
 
 def carry(func):
@@ -13,6 +14,7 @@ def carry(func):
     """
     args = []
 
+    @functools.wraps(func)
     def wrap(arg):
         args.append(arg)
         if len(args) == func.__code__.co_argcount:

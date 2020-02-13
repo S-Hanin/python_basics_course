@@ -8,6 +8,7 @@
 В случае несовпадения переданных во время вызова функции аргументов
 с типами аргументов в аннотации - выводить сообщение.
 """
+import functools
 import logging
 
 
@@ -24,6 +25,7 @@ def type_check(func):
     :raises: SignatureError
     """
 
+    @functools.wraps(func)
     def wrap(*args, **kwargs):
         _types = func.__annotations__.values()
         _args = list(args) + list(kwargs.values())
