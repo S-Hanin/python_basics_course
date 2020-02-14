@@ -8,6 +8,7 @@
 import functools
 import logging
 import time
+from collections import deque
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,7 +21,7 @@ def average_time(calls_count: int):
         raise ValueError("Argument must be int > 0")
 
     def wrap(func):
-        counted = []
+        counted = deque(maxlen=calls_count)
 
         @functools.wraps(func)
         def wwrap(*args, **kwargs):
@@ -28,7 +29,6 @@ def average_time(calls_count: int):
             start = time.time()
             func_result = func(*args, **kwargs)
             counted.append(time.time() - start)
-            counted = counted[-calls_count:]
             average = sum(counted) / len(counted) * 1000
             # noinspection Pylint
             logging.info(f"Среднее время работы {func}: {average:.0f} мс")

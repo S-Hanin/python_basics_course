@@ -30,6 +30,7 @@ def time_methods(*args):
     """
     Class decorator. Wraps methods by time measure decorator
     :param args: method names
+    :raises AttributeError, TypeError
     """
 
     def wrap_methods(cls):
