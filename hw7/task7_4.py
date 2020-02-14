@@ -29,13 +29,17 @@ def type_check(func):
 
     @functools.wraps(func)
     def wrap(*args, **kwargs):
-        _types = func.__annotations__.values()
+        _types = func.__annotations__.items()
         _args = list(args) + list(kwargs.values())
 
-        for arg, proper_type in zip(_args, _types):
-            if not isinstance(arg, proper_type):
-                logging.warning(f"arg {repr(arg)} is not an "
-                                f"instance of expected type {proper_type}")
+        for arg, annotation in zip(_args, _types):
+            arg_name, arg_type = annotation
+            if not isinstance(arg, arg_type):
+                logging.warning(f"argument {arg_name}={repr(arg)} is not an "
+                                f"instance of expected type {arg_type} "
+                                f"in {func}\n"
+                                f"file: {wrap.__code__.co_filename} "
+                                f"line: {func.__code__.co_firstlineno}")
         return func(*args, **kwargs)
 
     return wrap
@@ -48,7 +52,7 @@ def foo_test(a: int, b: str, c: int):
 
 
 # noinspection Pylint
-@type_check
+# @type_check
 def bar_test(a: int, b: str, c):
     print(b)
 
