@@ -24,8 +24,11 @@ def type_check(func):
 
     :raises: SignatureError
     """
+
+    # raises SignatureError at launch time
     if func.__code__.co_argcount != len(func.__annotations__):
-        raise SignatureError(f"Не все параметры функции {repr(func)} имеют аннотации")
+        raise SignatureError(f"Not all {func} arguments "
+                             f"has type annotation")
 
     @functools.wraps(func)
     def wrap(*args, **kwargs):
