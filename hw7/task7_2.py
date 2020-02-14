@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
 
 """
-Напишите параметризованный декоратор, который считает и выводит
-при каждом вызове среднее время работы функции за n последних вызовов.
-Время выводить в миллисекундах.
+Напишите параметризованный декоратор для классов,
+который будет считать и выводить время работы методов класса,
+имена которых переданы в параметрах декоратора.
 """
 import functools
 import logging
@@ -29,7 +29,7 @@ def _measure_time(func):
 def time_methods(*args):
     """
     Class decorator. Wraps methods by time measure decorator
-    :param args: methods names
+    :param args: method names
     """
 
     def wrap_methods(cls):
@@ -44,7 +44,7 @@ def time_methods(*args):
     return wrap_methods
 
 
-@time_methods('foo', '__init__', '__new__')
+@time_methods('foo_test', '__init__', '__new__')
 class Baz:
     """
     Class for decorator testing

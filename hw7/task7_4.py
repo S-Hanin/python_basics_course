@@ -14,7 +14,7 @@ import logging
 
 class SignatureError(Exception):
     """
-    Raise it when function signature does not contains annotations
+    Raise it when function signature have no annotations
     """
 
 
@@ -24,13 +24,14 @@ def type_check(func):
 
     :raises: SignatureError
     """
+    if func.__code__.co_argcount != len(func.__annotations__):
+        raise SignatureError(f"Не все параметры функции {repr(func)} имеют аннотации")
 
     @functools.wraps(func)
     def wrap(*args, **kwargs):
         _types = func.__annotations__.values()
         _args = list(args) + list(kwargs.values())
-        if len(_args) != len(_types):
-            raise SignatureError(f"Не все параметры функции {repr(func)} имеют аннотации")
+
         for arg, proper_type in zip(_args, _types):
             if not isinstance(arg, proper_type):
                 logging.warning(f"arg {repr(arg)} is not an "
@@ -43,6 +44,12 @@ def type_check(func):
 # noinspection Pylint
 @type_check
 def foo_test(a: int, b: str, c: int):
+    print(b)
+
+
+# noinspection Pylint
+@type_check
+def bar_test(a: int, b: str, c):
     print(b)
 
 

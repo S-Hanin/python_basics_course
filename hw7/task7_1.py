@@ -31,7 +31,7 @@ def average_time(calls_count: int):
             counted = counted[-calls_count:]
             average = sum(counted) / len(counted) * 1000
             # noinspection Pylint
-            logging.info(f"Среднее время работы: {average:.0f} мс")
+            logging.info(f"Среднее время работы {func}: {average:.0f} мс")
             return func_result
 
         return wwrap
