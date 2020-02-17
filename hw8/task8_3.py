@@ -40,7 +40,8 @@ def through_postman_and_back(in_filename: str, out_filename: str):
         img_octets = files.get(pathlib.Path(in_filename).name)
         img = base64.b64decode(img_octets.split(",")[-1])
         wfh.write(img)
+        return len(img)
 
 
 if __name__ == '__main__':
-    through_postman_and_back("data/img.jpeg", "data/from_postman.jpeg")
+    print(f"filesize: {through_postman_and_back('data/img.jpeg', 'data/from_postman.jpeg')} bytes")
