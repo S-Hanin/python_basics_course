@@ -11,7 +11,7 @@ import re
 
 def is_password_in_rules(password: str):
     """
-    Checks password to password restrictions conformity
+    Checks password conformity to restrictions
     """
     rx = r"(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z_*%&]{8,12}"
     return True if re.match(rx, password) else False
