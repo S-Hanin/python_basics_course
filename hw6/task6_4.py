@@ -10,8 +10,7 @@ from collections.abc import Sequence
 
 def cycle(collection: Sequence):
     """
-    Returns `LoopedIterator` instance, who iterates collection
-    `repeat` times
+    Iterate elements of collection infinitely
 
     :param collection: sized iterable
     """
