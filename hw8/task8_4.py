@@ -13,8 +13,16 @@ def search_iso_date(text: str):
     Search iso formatted (YYYY-MM-DDThh:mm:ss±hh:mm) date from text
     """
 
-    pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}"
-    return re.search(pattern, text).group(0)
+    pattern = r"""\d{4}-  # YYYY-
+                  \d{2}-  # MM-
+                  \d{2}T  # DDT
+                  \d{2}:  # hh:
+                  \d{2}:  # mm:
+                  \d{2}[+-]  # ss[+-]
+                  \d{2}:  # hh:
+                  \d{2}   # mm"""
+    match = re.search(pattern, text, re.VERBOSE)
+    return match.group(0) if match else None
 
 
 if __name__ == '__main__':
