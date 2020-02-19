@@ -24,9 +24,8 @@ def _replace_none_in_annotation(parameter):
     Does replacing in such annotations as (int, None) to (int, NoneType)
     """
     if isinstance(parameter.annotation, tuple) and None in parameter.annotation:
-        annotation = list(parameter.annotation)
-        annotation.remove(None)
-        annotation.append(type(None))
+        annotation = tuple(item if item is not None else type(item)
+                           for item in parameter.annotation)
         return parameter.replace(annotation=tuple(annotation))
     return parameter
 
@@ -70,11 +69,13 @@ def type_check(func):
     :raises: SignatureError
     """
 
-    # raises SignatureError at launch time
+    # check return type
     sig = inspect.signature(func)
     if sig.return_annotation is sig.empty:
         raise SignatureError(f"{func} has not return type annotation")
-    param_without_annotation = [item for item, param in sig.parameters.items()
+
+    # check parameters have annotations
+    param_without_annotation = [arg_name for arg_name, param in sig.parameters.items()
                                 if param.annotation is sig.empty]
     if len(param_without_annotation) > 0:
         raise SignatureError(f"{func} arguments {param_without_annotation}"
