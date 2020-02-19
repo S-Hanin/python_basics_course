@@ -37,11 +37,7 @@ def _inspect_var_positional(arg_name, arg_value, parameter, func):
     """
     if parameter.kind == parameter.VAR_POSITIONAL:
         if not all(isinstance(item, parameter.annotation) for item in arg_value):
-            logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
-                            f"instance of expected type {parameter.annotation} "
-                            f"in {func}\n"
-                            f"file: {func.__code__.co_filename} "
-                            f"line: {func.__code__.co_firstlineno}")
+            return True
 
 
 def _inspect_var_keyword(arg_name, arg_value, parameter, func):
@@ -50,23 +46,17 @@ def _inspect_var_keyword(arg_name, arg_value, parameter, func):
     """
     if parameter.kind == parameter.VAR_KEYWORD:
         if not all(isinstance(item, parameter.annotation) for item in arg_value.values()):
-            logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
-                            f"instance of expected type {parameter.annotation} "
-                            f"in {func}\n"
-                            f"file: {func.__code__.co_filename} "
-                            f"line: {func.__code__.co_firstlineno}")
+            return True
 
 
 def _inspect_common_parameter(arg_name, arg_value, parameter, func):
     """
     Does inspection of positional and named parameters
     """
-    if not isinstance(arg_value, parameter.annotation):
-        logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
-                        f"instance of expected type {parameter.annotation} "
-                        f"in {func}\n"
-                        f"file: {func.__code__.co_filename} "
-                        f"line: {func.__code__.co_firstlineno}")
+    if parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD,
+                          parameter.KEYWORD_ONLY):
+        if not isinstance(arg_value, parameter.annotation):
+            return True
 
 
 def type_check(func):
@@ -82,6 +72,8 @@ def type_check(func):
 
     # raises SignatureError at launch time
     sig = inspect.signature(func)
+    if sig.return_annotation is sig.empty:
+        raise SignatureError(f"{func} has not return type annotation")
     param_without_annotation = [item for item, param in sig.parameters.items()
                                 if param.annotation is sig.empty]
     if len(param_without_annotation) > 0:
@@ -94,13 +86,19 @@ def type_check(func):
 
         for param_signature, argument in zip(sig.parameters.items(), ba.arguments.items()):
             arg_name, arg_value = argument
-            param_name, parameter = param_signature
+            _, parameter = param_signature
 
             parameter = _replace_none_in_annotation(parameter)
 
-            _inspect_var_positional(arg_name, arg_value, parameter, func)
-            _inspect_var_keyword(arg_name, arg_value, parameter, func)
-            _inspect_common_parameter(arg_name, arg_value, parameter, func)
+            checks = [_inspect_var_positional(arg_name, arg_value, parameter, func),
+                      _inspect_var_keyword(arg_name, arg_value, parameter, func),
+                      _inspect_common_parameter(arg_name, arg_value, parameter, func)]
+            if any(checks):
+                logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
+                                f"instance of expected type {parameter.annotation} "
+                                f"in {func}\n"
+                                f"file: {func.__code__.co_filename} "
+                                f"line: {func.__code__.co_firstlineno}")
         return func(*args, **kwargs)
 
     return wrap
@@ -108,23 +106,23 @@ def type_check(func):
 
 if __name__ == '__main__':
     @type_check
-    def a_test(*args: int, k: str):
-        print(k)
+    def a_test(*args: int, k: str) -> None:
+        pass
 
 
     @type_check
-    def b_test(a: (int, None), **kwargs: str):
-        print(kwargs)
+    def b_test(a: (int, None), **kwargs: str) -> None:
+        pass
 
 
     @type_check
-    def c_test(a: int, b: str, c: int):
-        print(b)
+    def c_test(a: int, b: str, c: int) -> None:
+        pass
 
 
     # @type_check
-    def d_test(a: int, b: str, c):  # raises signature error
-        print(b)
+    def d_test(a: int, b: str, c) -> None:  # raises signature error
+        pass
 
 
     a_test(1, 2, '3', k="hello")
