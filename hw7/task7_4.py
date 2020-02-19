@@ -9,6 +9,7 @@
 с типами аргументов в аннотации - выводить сообщение.
 """
 import functools
+import inspect
 import logging
 
 
@@ -18,47 +19,116 @@ class SignatureError(Exception):
     """
 
 
+def replace_none_in_annotation(parameter):
+    """
+    Does replacing in such annotations as (int, None) to (int, NoneType)
+    """
+    if isinstance(parameter.annotation, tuple) and None in parameter.annotation:
+        annotation = list(parameter.annotation)
+        annotation.remove(None)
+        annotation.append(type(None))
+        return parameter.replace(annotation=tuple(annotation))
+    return parameter
+
+
+def inspect_var_positional(arg_name, arg_value, parameter, func):
+    """
+    Does inspection of *args parameters
+    """
+    if parameter.kind == parameter.VAR_POSITIONAL:
+        if not all(isinstance(item, parameter.annotation) for item in arg_value):
+            logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
+                            f"instance of expected type {parameter.annotation} "
+                            f"in {func}\n"
+                            f"file: {func.__code__.co_filename} "
+                            f"line: {func.__code__.co_firstlineno}")
+
+
+def inspect_var_keyword(arg_name, arg_value, parameter, func):
+    """
+    Does inspection of **kwargs parameters
+    """
+    if parameter.kind == parameter.VAR_KEYWORD:
+        if not all(isinstance(item, parameter.annotation) for item in arg_value.values()):
+            logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
+                            f"instance of expected type {parameter.annotation} "
+                            f"in {func}\n"
+                            f"file: {func.__code__.co_filename} "
+                            f"line: {func.__code__.co_firstlineno}")
+
+
+def inspect_common_parameter(arg_name, arg_value, parameter, func):
+    """
+    Does inspection of positional and named parameters
+    """
+    if not isinstance(arg_value, parameter.annotation):
+        logging.warning(f"argument {arg_name}={repr(arg_value)} is not an "
+                        f"instance of expected type {parameter.annotation} "
+                        f"in {func}\n"
+                        f"file: {func.__code__.co_filename} "
+                        f"line: {func.__code__.co_firstlineno}")
+
+
 def type_check(func):
     """
     Decorator. Checks argument types as had been annotated
+    checks signatures such:
+        foo(a: int)
+        foo(a: (int, None))
+        foo(*args, **kwargs)
 
     :raises: SignatureError
     """
 
     # raises SignatureError at launch time
-    if func.__code__.co_argcount != len(func.__annotations__):
-        raise SignatureError(f"Not all {func} arguments "
-                             f"has type annotation")
+    sig = inspect.signature(func)
+    param_without_annotation = [item for item, param in sig.parameters.items()
+                                if param.annotation is sig.empty]
+    if len(param_without_annotation) > 0:
+        raise SignatureError(f"{func} arguments {param_without_annotation}"
+                             f" has not type annotation")
 
     @functools.wraps(func)
     def wrap(*args, **kwargs):
-        _types = func.__annotations__.items()
-        _args = list(args) + list(kwargs.values())
+        ba = sig.bind(*args, **kwargs)
 
-        for arg, annotation in zip(_args, _types):
-            arg_name, arg_type = annotation
-            if not isinstance(arg, arg_type):
-                logging.warning(f"argument {arg_name}={repr(arg)} is not an "
-                                f"instance of expected type {arg_type} "
-                                f"in {func}\n"
-                                f"file: {wrap.__code__.co_filename} "
-                                f"line: {func.__code__.co_firstlineno}")
+        for param_signature, argument in zip(sig.parameters.items(), ba.arguments.items()):
+            arg_name, arg_value = argument
+            param_name, parameter = param_signature
+
+            parameter = replace_none_in_annotation(parameter)
+
+            inspect_var_positional(arg_name, arg_value, parameter, func)
+            inspect_var_keyword(arg_name, arg_value, parameter, func)
+            inspect_common_parameter(arg_name, arg_value, parameter, func)
         return func(*args, **kwargs)
 
     return wrap
 
 
+@type_check
+def a_test(*args: int, k: str):
+    print(k)
+
+
+@type_check
+def b_test(a: (int, None), **kwargs: str):
+    print(kwargs)
+
+
 # noinspection Pylint
 @type_check
-def foo_test(a: int, b: str, c: int):
+def c_test(a: int, b: str, c: int):
     print(b)
 
 
 # noinspection Pylint
 # @type_check
-def bar_test(a: int, b: str, c):
+def d_test(a: int, b: str, c):  # raises signature error
     print(b)
 
 
-foo_test(1, "first_call", c="2")
-foo_test(1, "second call", c=1)
+a_test(1, 2, '3', k="hello")
+b_test(None, b="a", c=1)
+c_test(1, "first_call", c="2")
+c_test(1, "second call", c=1)
