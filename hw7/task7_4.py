@@ -19,7 +19,7 @@ class SignatureError(Exception):
     """
 
 
-def replace_none_in_annotation(parameter):
+def _replace_none_in_annotation(parameter):
     """
     Does replacing in such annotations as (int, None) to (int, NoneType)
     """
@@ -31,7 +31,7 @@ def replace_none_in_annotation(parameter):
     return parameter
 
 
-def inspect_var_positional(arg_name, arg_value, parameter, func):
+def _inspect_var_positional(arg_name, arg_value, parameter, func):
     """
     Does inspection of *args parameters
     """
@@ -44,7 +44,7 @@ def inspect_var_positional(arg_name, arg_value, parameter, func):
                             f"line: {func.__code__.co_firstlineno}")
 
 
-def inspect_var_keyword(arg_name, arg_value, parameter, func):
+def _inspect_var_keyword(arg_name, arg_value, parameter, func):
     """
     Does inspection of **kwargs parameters
     """
@@ -57,7 +57,7 @@ def inspect_var_keyword(arg_name, arg_value, parameter, func):
                             f"line: {func.__code__.co_firstlineno}")
 
 
-def inspect_common_parameter(arg_name, arg_value, parameter, func):
+def _inspect_common_parameter(arg_name, arg_value, parameter, func):
     """
     Does inspection of positional and named parameters
     """
@@ -96,39 +96,38 @@ def type_check(func):
             arg_name, arg_value = argument
             param_name, parameter = param_signature
 
-            parameter = replace_none_in_annotation(parameter)
+            parameter = _replace_none_in_annotation(parameter)
 
-            inspect_var_positional(arg_name, arg_value, parameter, func)
-            inspect_var_keyword(arg_name, arg_value, parameter, func)
-            inspect_common_parameter(arg_name, arg_value, parameter, func)
+            _inspect_var_positional(arg_name, arg_value, parameter, func)
+            _inspect_var_keyword(arg_name, arg_value, parameter, func)
+            _inspect_common_parameter(arg_name, arg_value, parameter, func)
         return func(*args, **kwargs)
 
     return wrap
 
 
-@type_check
-def a_test(*args: int, k: str):
-    print(k)
+if __name__ == '__main__':
+    @type_check
+    def a_test(*args: int, k: str):
+        print(k)
 
 
-@type_check
-def b_test(a: (int, None), **kwargs: str):
-    print(kwargs)
+    @type_check
+    def b_test(a: (int, None), **kwargs: str):
+        print(kwargs)
 
 
-# noinspection Pylint
-@type_check
-def c_test(a: int, b: str, c: int):
-    print(b)
+    @type_check
+    def c_test(a: int, b: str, c: int):
+        print(b)
 
 
-# noinspection Pylint
-# @type_check
-def d_test(a: int, b: str, c):  # raises signature error
-    print(b)
+    # @type_check
+    def d_test(a: int, b: str, c):  # raises signature error
+        print(b)
 
 
-a_test(1, 2, '3', k="hello")
-b_test(None, b="a", c=1)
-c_test(1, "first_call", c="2")
-c_test(1, "second call", c=1)
+    a_test(1, 2, '3', k="hello")
+    b_test(None, b="a", c=1)
+    c_test(1, "first_call", c="2")
+    c_test(1, "second call", c=1)
